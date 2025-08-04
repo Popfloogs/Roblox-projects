@@ -1,0 +1,19 @@
+local touchEvent, seekerRespawnEvent, players = game.ReplicatedStorage.Events.lightTouch, game.ReplicatedStorage.Events.seekerRespawn, game:GetService("Players")
+local connection
+local flSanity = require(game.ReplicatedStorage.Scripts.FLSanity)
+
+--Touch event for light hitbox
+--DEV IDEA: May switch to magnitude check for more reliable hit detection
+connection = touchEvent.OnServerEvent:Connect(function(plr, target)
+	local hideCheck = game.Players:GetPlayerFromCharacter(target.Parent)
+	if hideCheck.Backpack:WaitForChild("HidingVal").Value == false then
+		print(plr.Name, target.Name) --testing
+		local hum = target.Parent:WaitForChild("Humanoid") -- targets the humanoid of hit player
+		hum:TakeDamage(100) -- deals damage
+	
+	--Removes flashlight from current seeker for reuse by next seeker
+		plr.Backpack.seekerVal.Value = false
+		plr.Character:WaitForChild("Humanoid"):UnequipTools()
+		flSanity.FLRemove(plr, target)
+	end
+end)
