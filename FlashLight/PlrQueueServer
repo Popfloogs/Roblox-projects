@@ -1,0 +1,35 @@
+--FIX ME: Assign seeker a specific spawn point with 10 seconds for players to get ready
+--DEV IDEA: Spectator mode???
+
+local plrQueue, plrTable, seeker, allClientEvent = game.ReplicatedStorage.Events.plrQueue, {}, nil, game.ReplicatedStorage.Events.scoreKeeper
+local connection
+local fl = game.ReplicatedStorage.Tools:WaitForChild("Flashlight"):Clone()
+print("Server Loaded")
+
+--Listener for starting script to add players to selection queue
+connection = plrQueue.OnServerEvent:Connect(function(plr)
+	print(plr.Name, " has joined the queue")
+	
+	--Adds players to table and provides tools to players for when they become seeker
+	table.insert(plrTable, plr) 
+	fl.Enabled = false
+	fl.Parent = plr:WaitForChild("Backpack")
+end)
+
+
+print(plrTable)
+
+while #plrTable < 2  do --waits until adequite number of players are loaded into game
+	wait(1)
+end
+
+allClientEvent:FireAllClients()
+
+seeker = plrTable[math.random(1, #plrTable)] --Selects first seeker
+print("Seeker is ", seeker.Name)
+
+--enables flashlight for seeker and sets seeker bool value to prevent hiding
+seeker.Backpack.Flashlight.Enabled = true
+seekerBool = seeker.Backpack.seekerVal
+seekerBool.Value = true
+connection:Disconnect() -- disconnects player queue listener for memory purposes
