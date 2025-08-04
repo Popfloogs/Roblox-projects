@@ -1,0 +1,130 @@
+--[[Dev Notes: 
+]]--
+
+--Dart Stuff
+local dartPlayerGUI, dartTimerGUI, dartEvent, dartEventEnd = workspace.Buildings.GameBooth["Dart Toss"].DartQueue.dartCount:WaitForChild("SurfaceGui").TextLabel, workspace.Buildings.GameBooth["Dart Toss"].DartQueue.dartTimer.SurfaceGui.TextLabel, game.ReplicatedStorage.Events.dartEvents.dartEvent, game.ReplicatedStorage.Events.dartEvents.dartEventEnd
+--duck stuff
+local duckPlayerGUI, duckTimerGui, duckEvent, duckEventEnd = workspace.Buildings.GameBooth["Duck Booth"].DuckQueue.duckCount:WaitForChild("SurfaceGui").TextLabel, workspace.Buildings.GameBooth["Duck Booth"].DuckQueue.duckTimer.SurfaceGui.TextLabel, game.ReplicatedStorage.Events.duckEvents.duckEvent, game.ReplicatedStorage.Events.duckEvents.duckEventEnd
+--ball stuff
+local ballPlayerGUI, ballTimerGui, ballEvent, ballEventEnd = workspace.Buildings.GameBooth["Ball Toss"].BallQueue.ballCount:WaitForChild("SurfaceGui").TextLabel, workspace.Buildings.GameBooth["Ball Toss"].BallQueue.ballTimer.SurfaceGui.TextLabel, game.ReplicatedStorage.Events.ballEvents.ballEvent, game.ReplicatedStorage.Events.ballEvents.ballEventEnd
+
+--general defs
+local teleService = game:GetService("TeleportService")
+
+
+local minigames =  {
+	dart = {
+		players = {},
+		timerGui = dartTimerGUI,
+		countGui = dartPlayerGUI,
+		playerCounts = 0,
+		timer = 15
+	},
+	duck = {
+		players = {},
+		timerGui = duckTimerGui,
+		countGui = duckPlayerGUI,
+		playerCounts = 0,
+		timer = 30
+	},
+	ball = {
+		players = {},
+		timerGui = ballTimerGui,
+		countGui = ballPlayerGUI,
+		playerCounts = 0,
+		timer = 30
+	}
+}
+
+local player = game.Players
+
+--Functions
+
+local function addPlr(plr, booth)
+	local name = plr.Name
+	if table.find(minigames["dart"]["players"], plr) == nil and table.find(minigames["duck"]["players"], plr) == nil and table.find(minigames["ball"]["players"], plr) == nil and minigames[booth]["playerCounts"] ~= 5 then
+		table.insert(minigames[booth]["players"], plr)
+		minigames[booth]["playerCounts"] += 1
+		minigames[booth]["countGui"].Text = minigames[booth]["playerCounts"].."/5"
+		print(minigames[booth]["players"])
+	end
+end
+
+local function remvPlr(plr, booth)
+	if table.find(minigames[booth]["players"], plr) ~= nil then
+		minigames[booth]["playerCounts"] -= 1
+		table.remove(minigames[booth]["players"], table.find(minigames[booth]["players"], plr))
+		minigames[booth]["countGui"].Text = minigames[booth]["playerCounts"].."/5"
+	end	
+end
+
+local function timer(plr, booth)
+	local code = teleService:ReserveServer(82328795787899)
+	if minigames[booth]["playerCounts"] == 1 then
+		for i = minigames[booth]["timer"], 0, -1 do
+			if minigames[booth]["playerCounts"] ~= 0 and i ~= 0 then
+				minigames[booth]["timerGui"].Text = i
+				wait(1)
+			elseif i == 0 and minigames[booth]["playerCounts"] ~= 1 then
+				local playersToTele = minigames[booth]["players"]
+				local success, result = pcall(function()				
+					teleService:TeleportToPrivateServer(82328795787899, code, playersToTele)
+				end)
+				if success then
+					minigames[booth]["timerGui"].Text = minigames[booth]["timer"]
+					remvPlr(plr, booth)
+				end
+			else
+				minigames[booth]["timerGui"].Text = minigames[booth]["timer"]
+				break
+			end
+		end
+	end
+end
+
+dartEvent.OnServerEvent:Connect(function(plr)
+	local booth = "dart"
+	addPlr(plr, booth)
+	timer(plr, booth)	
+end)
+
+dartEventEnd.OnServerEvent:Connect(function(plr)
+	local booth = "dart"
+	remvPlr(plr, booth)
+end)
+
+duckEvent.OnServerEvent:Connect(function(plr)
+	local booth = "duck"
+	addPlr(plr, booth)
+	timer(plr, booth)	
+end)
+
+duckEventEnd.OnServerEvent:Connect(function(plr)
+	local booth = "duck"
+	remvPlr(plr, booth)
+end)
+
+ballEvent.OnServerEvent:Connect(function(plr)
+	local booth = "ball"
+	addPlr(plr, booth)
+	timer(plr, booth)	
+end)
+
+ballEventEnd.OnServerEvent:Connect(function(plr)
+	local booth = "ball"
+	remvPlr(plr, booth)
+end)
+
+player.PlayerRemoving:Connect(function(plr)
+	local  booth
+	if minigames["dart"]["players"][plr] ~= nil or minigames["duck"]["players"][plr] ~= nil or minigames["ball"]["players"][plr] ~= nil then
+		if minigames["dart"]["players"][plr] ~= nil then
+			booth = "dart"
+		elseif minigames["duck"]["players"][plr] ~= nil then
+			booth = "duck"
+		elseif minigames["ball"]["players"][plr] ~= nil then
+			booth = "ball"
+		end
+		remvPlr(plr, booth)
+	end
+end)
