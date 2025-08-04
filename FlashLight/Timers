@@ -1,0 +1,25 @@
+--FIXME: Timer resets after death
+
+local timerEvent, startTimer = game.ReplicatedStorage.Events.scoreKeeper, game.Players.LocalPlayer.PlayerGui:WaitForChild("scoreGUI").GameStartTimer
+local gameTimer = game.Players.LocalPlayer.PlayerGui.scoreGUI.timerLabel
+
+timerEvent.OnClientEvent:Connect(function()
+	local hum = game.Players.LocalPlayer.Character:WaitForChild("Humanoid")
+	hum.WalkSpeed = 0
+	startTimer.Visible = true
+	
+	for i = 10, 0, -1 do
+		startTimer.Visible = true
+		startTimer.Text = i
+		wait(1)
+		startTimer.Visible = false
+	end
+	startTimer.Text = "Go!"
+	wait(1)
+	hum.WalkSpeed = 30
+	
+	for i = 300, 0, -1 do
+		gameTimer.Text = string.format("%02d:%02d", math.floor(i/60), i%60) --FIXME: Timer needs to be persistant
+		wait(1)
+	end
+end)
