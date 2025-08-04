@@ -1,0 +1,20 @@
+local data = {}
+local playerData = {}
+
+function data.addPlr(player, data)
+	playerData[player] = data
+end
+
+function data.returnData(player)
+	return playerData[player]
+end
+
+function data.removePlr(player)
+	playerData[player] = nil
+end
+
+function data.updatePlr(player, data)
+	playerData[player] = data
+end
+
+return data
