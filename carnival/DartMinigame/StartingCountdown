@@ -1,0 +1,15 @@
+local Player = game.Players
+local round = game.ReplicatedStorage.RoundRE
+
+Player.PlayerAdded:Connect(function(plr)
+	game.ReplicatedStorage.PlayerJoinedRE:FireAllClients()
+	local label = plr.PlayerGui:WaitForChild("ScreenGui").startTimer
+	for i = 10, 0, -1 do
+		print(i)
+		label.Text = i
+		wait(1)
+	end
+	label.Text = "Go!"
+	wait(3)
+	label.Visible = false
+end)
