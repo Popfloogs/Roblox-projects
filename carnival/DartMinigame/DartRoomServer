@@ -1,0 +1,85 @@
+--[[Dev Notes:
+1. Cut player movement and create round screenGUIs
+2. Timer GUI needs added
+4. when player is hit by dart pop balloon above head
+5. When player is out of balloons they are removed from game and teleported to lobby
+6. Ticket costs
+)]]--
+
+local dartThrow = game.ReplicatedStorage.Room1:WaitForChild("DartEvent")
+local balloon = workspace.Balloons:GetChildren()
+local inc, dec = 0, 0
+local module = require(game.ServerScriptService.healthScript)
+local popped = 0
+local DB = true
+local Players, round = game.Players:GetChildren(), game.ReplicatedStorage.Round.Value
+round = 1
+
+
+local function BalloonPop(plr, dart)
+	local char = plr.Character
+	local hum = char:WaitForChild("Humanoid")
+	for _, i in balloon do
+		if i.Transparency == 0 then
+			i.Touched:Connect(function(hit)
+				if DB == true then
+					if hit.Name == "DartRootPart" then
+						local pop = game.ReplicatedStorage.Room1.Pop:Clone()
+						pop.Parent = hum
+						pop:Play()
+						i:Destroy()
+						dart:Destroy()
+						inc +=25
+						module.incHealth(plr, inc)
+						DB = false
+					end
+				end
+			end)
+		end
+	end
+	round = 2
+end
+
+local function PlayerPop(plr, dart)
+	local char = plr.Character
+	local hum = char:WaitForChild("Humanoid")
+	for _, i in Players do
+		if i.Character:WaitForChild("Humanoid").Hp ~= 0 then
+			i.Touched:Connect(function(hit)
+				if DB == true then
+					if hit.Name == "DartRootPart" then
+						local pop = game.ReplicatedStorage.Room1.Pop:Clone()
+						dart:Destroy()
+						dec -=25
+						module.decHealth(i, dec)
+						DB = false
+					end
+				end
+			end)
+		end
+	end
+end
+
+if DB == true then
+	dartThrow.OnServerInvoke = function(plr, mousePos)
+		local char = plr.Character
+		local dart = game.ReplicatedStorage.Room1.Dart:WaitForChild("DartRootPart"):Clone()
+		local hum = char:WaitForChild("Humanoid")
+		local anim = hum:WaitForChild("Animator")
+		local throw = anim:LoadAnimation(game.ReplicatedStorage.Room1.Throw)
+		throw:Play()
+		dart.CFrame = char:WaitForChild("RightHand").CFrame
+		local bodyVelocity = Instance.new("BodyVelocity")
+		bodyVelocity.Velocity = CFrame.new(dart.Position, mousePos).LookVector * 60
+		bodyVelocity.MaxForce = Vector3.new(1e6, 1e6, 1e6)
+		bodyVelocity.Parent = dart
+		dart.Parent = workspace
+		if round == 1 then
+			BalloonPop(plr, dart)
+		elseif round == 2 then
+			PlayerPop(plr, dart)
+		end
+		DB = true
+
+	end
+end
