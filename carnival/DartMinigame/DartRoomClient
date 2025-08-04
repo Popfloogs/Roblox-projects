@@ -1,0 +1,16 @@
+--[[ Dev Notes:
+Seems ok for now
+]]--
+
+local plr = game.Players.LocalPlayer
+local char = plr.Character
+local hum = char.Humanoid
+local mouse = plr:GetMouse()
+local DartEvent = game.ReplicatedStorage.Room1.DartEvent
+plr.CameraMode = Enum.CameraMode.LockFirstPerson
+
+
+wait(10)
+mouse.Button1Down:Connect(function()
+	DartEvent:InvokeServer(mouse.Hit.Position)
+end)
