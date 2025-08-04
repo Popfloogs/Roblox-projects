@@ -1,0 +1,23 @@
+local role = game.Players.LocalPlayer.PlayerGui:WaitForChild("scoreGUI").roleLabel
+local seekerVal, scoreEvent = game.Players.LocalPlayer.Backpack:WaitForChild("seekerVal"), game.ReplicatedStorage.Events.scoreKeeper
+local gameTimer, playerScore = game.Players.LocalPlayer.PlayerGui.scoreGUI.timerLabel, game.Players.LocalPlayer.PlayerGui.scoreGUI.scoreLabel
+local score = game.Players.LocalPlayer.Backpack.tags
+
+while true do
+	if seekerVal.Value == true then
+		print("Conditional: Seeker")
+		role.Visible = true
+		role.Text = "Seeker"
+		role.TextColor3 = Color3.new(255, 0, 0)
+		role.TextSize = 20
+	elseif seekerVal.Value == false then
+		print("Conditional: Hider")
+		role.Visible = true
+		role.Text = "Hider"
+		role.TextColor3 = Color3.new(0, 255, 0)
+		role.TextSize = 20
+	end
+	playerScore.Text = score.Value --FIXME: Score needs to be persistant. Right now it is not.
+	
+	wait(1)
+end
