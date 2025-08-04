@@ -1,0 +1,51 @@
+local plr = game.Players.LocalPlayer
+local DB = true
+
+--touch defs darts
+local dartQueue, dartEvent, dartEventEnd = workspace.Buildings.GameBooth["Dart Toss"]:WaitForChild("DartQueue"), game.ReplicatedStorage.Events.dartEvents.dartEvent, game.ReplicatedStorage.Events.dartEvents.dartEventEnd
+
+dartQueue.Touched:Connect(function(Hit)
+	if DB then
+		if Hit.Parent == plr.Character then
+			DB = false
+			dartEvent:FireServer(plr)
+		end
+		DB = true
+	end
+	
+end)
+dartQueue.TouchEnded:Connect(function(Hit)
+	if Hit.Parent == plr.Character then
+		dartEventEnd:FireServer(plr)
+	end
+end)
+
+--touch defs ducks
+local duckQueue, duckEvent, duckEventEnd = workspace.Buildings.GameBooth["Duck Booth"]:WaitForChild("DuckQueue"), game.ReplicatedStorage.Events.duckEvents.duckEvent, game.ReplicatedStorage.Events.duckEvents.duckEventEnd
+
+duckQueue.Touched:Connect(function(Hit)
+	if Hit.Parent == plr.Character then
+		duckEvent:FireServer(plr)
+	end
+end)
+
+duckQueue.TouchEnded:Connect(function(Hit)
+	if Hit.Parent == plr.Character then
+		duckEventEnd:FireServer(plr)
+	end
+end)
+
+--touch defs ball
+local ballQueue, ballEvent, ballEventEnd = workspace.Buildings.GameBooth["Ball Toss"]:WaitForChild("BallQueue"), game.ReplicatedStorage.Events.ballEvents.ballEvent, game.ReplicatedStorage.Events.ballEvents.ballEventEnd
+
+ballQueue.Touched:Connect(function(Hit)
+	if Hit.Parent == plr.Character then
+		ballEvent:FireServer(plr)
+	end
+end)
+
+ballQueue.TouchEnded:Connect(function(Hit)
+	if Hit.Parent == plr.Character then
+		ballEventEnd:FireServer(plr)
+	end
+end)
