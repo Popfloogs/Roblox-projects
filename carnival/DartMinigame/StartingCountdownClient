@@ -1,0 +1,17 @@
+local Event = game.ReplicatedStorage.PlayerJoinedRE
+local plr = game.Players.LocalPlayer
+local roundend = game.ReplicatedStorage.Room1["Round 2"]
+local round = game.ReplicatedStorage.RoundRE
+local hum = plr.Character:WaitForChild("Humanoid")
+
+Event.OnClientEvent:Connect(function()
+	local humWalk = hum.WalkSpeed
+	hum.WalkSpeed = 0
+	wait(10)
+	hum.WalkSpeed = humWalk
+end)
+
+roundend.OnClientEvent:Connect(function()
+	roundend:FireServer(plr)
+
+end)
