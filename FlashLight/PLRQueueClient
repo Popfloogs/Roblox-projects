@@ -1,0 +1,7 @@
+local plr, plrQueue = game.Players.LocalPlayer, game.ReplicatedStorage:WaitForChild("Events").plrQueue
+local char = plr.Character or plr.CharacterAdded:Wait()
+print("Player Loaded")
+--This script simply adds new players to the queue by sending their info to the server
+
+
+plrQueue:FireServer()
