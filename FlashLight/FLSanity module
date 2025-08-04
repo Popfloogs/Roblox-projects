@@ -1,0 +1,39 @@
+local module = {}
+
+--Unused currently
+	function module.FLSanity(plr)
+		local Fl = game.ReplicatedStorage.Tools:WaitForChild("Flashlight"):Clone()
+		local packContents = plr.Backpack:GetChildren()
+		wait(2)
+		for i in ipairs(packContents) do
+			if not packContents[i]:IsA("BoolValue") and not packContents[i]:IsA("IntValue") then
+				if packContents[i]:IsA("Tool") then
+					print("Flashlight Found")
+					return
+			
+				else
+					Fl.Parent = plr.Backpack
+				end
+			end
+		end
+	end
+
+--Only module used. removes light and gives it to tagged player
+	function module.FLRemove(plr, target)
+		plr.Backpack:FindFirstChild("Flashlight").Parent = game.ReplicatedStorage.Tools.UsedLights
+		plr.Backpack.tags.Value += 1
+		wait(1)
+		local newSeeker = game.Players:GetPlayerFromCharacter(target.Parent)
+		newSeeker.CharacterAdded:Wait()
+		game.ReplicatedStorage.Tools.UsedLights:WaitForChild("Flashlight").Parent = newSeeker.Backpack
+		newSeeker.Character:WaitForChild("Humanoid").WalkSpeed = 30
+		newSeeker.Backpack.seekerVal.Value = true
+	end
+
+--only used at beginning of game
+	function module.FLAdd(plr)
+		local fl = game.ReplicatedStorage.Tools.Flashlight:Clone()
+		fl.Parent = plr.Backpack
+	end
+
+return module
