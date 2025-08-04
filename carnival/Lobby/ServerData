@@ -1,0 +1,90 @@
+--[[Dev Notes:
+1. Unsure if DataStore is Saving on player Leave
+2. how to transfer DataStore Info?
+]]--
+
+--Variable Declaration 
+local dataStoreService = game:GetService("DataStoreService")
+local dataEvent, testEvent = game.ReplicatedStorage.PlayerData.DataEvent, game.ReplicatedStorage.Events.testEvent 
+local Players = game.Players
+local ticketsFolder = Instance.new("Folder")
+ticketsFolder.Parent = game.ServerStorage
+ticketsFolder.Name = "ticketStorageServer"
+
+local inventoryStore = dataStoreService:GetDataStore("PlayerInventory")
+
+--Add plr to datastore
+local function addPlr(plr)
+	local PID = plr.UserId
+
+--check for preexisting plr ID and add accordingly
+	if inventoryStore:GetAsync(PID) == nil then
+		local tickets, ticketServer = Instance.new("IntValue"), Instance.new("IntValue")
+		tickets.Parent, ticketServer.Parent = plr, game.ServerStorage:WaitForChild("ticketStorageServer")
+		tickets.Name, ticketServer.Name = "Tickets", tostring(plr).. "'s Tickets"
+		tickets.Value, ticketServer.Value = 25, 25
+
+  --check for failure
+		local success, result = pcall(function()
+			inventoryStore:SetAsync(PID, {
+				["Tickets"] = 25,
+				["Backpack"] = {}
+			})
+		end)
+		
+		if success then
+			print("Data successfully saved!")
+			dataEvent:FireClient(plr)
+		else
+			warn("Error: ")
+			error(result)
+		end
+
+--fetch datastore for returning players
+	elseif inventoryStore:GetAsync(PID) ~= nil then
+		local tickets, ticketServer = Instance.new("IntValue"), Instance.new("IntValue")
+		tickets.Parent, ticketServer.Parent = plr, game.ServerStorage:WaitForChild("ticketStorageServer")
+		tickets.Name, ticketServer.Name = "Tickets", tostring(plr).. "'s Tickets"
+		tickets.Value, ticketServer.Value = 0, 0
+		
+		if inventoryStore:GetAsync(PID) ~= nil then
+			local success, result = pcall(function()
+				pData = inventoryStore:GetAsync(PID)
+			end)
+			
+			if success then
+				tickets.Value, ticketServer.Value = pData["Tickets"], pData["Tickets"]
+				dataEvent:FireClient(plr)
+			else
+				warn("Error: ")
+				error(result)
+			end
+		end
+	end
+end
+
+--remove a player
+local function remvPlr(plr)
+	local PID = plr.UserId
+	local pTickets = game.ServerStorage.ticketStorageServer:WaitForChild(tostring(plr).. "'s Tickets").Value
+	local success, result = pcall(function()
+		inventoryStore:SetAsync(PID, {
+			["Tickets"] = pTickets,
+			["Backpack"] = {}
+		})
+	end)
+	if success then
+		local plrTicks = game.ServerStorage.ticketStorageServer:WaitForChild(tostring(plr).. "'s Tickets")
+		plrTicks:Destroy()
+		local plrname = plr.Name
+	else
+		warn("Error: ")
+		error(result)
+	end
+end
+
+
+
+
+Players.PlayerAdded:Connect(addPlr)
+Players.PlayerRemoving:Connect(remvPlr)
