@@ -1,0 +1,46 @@
+--[[Dev Notes:
+1. Add health decrease for players in round two
+]]--
+
+local module = {}
+
+function module.incHealth(plr, inc)
+	local hp = 0
+	local hum = plr.Character:WaitForChild("Humanoid")
+	local maxhp = hum.MaxHealth
+	if hp ~= maxhp then
+		hp = inc
+		hum.Health = hp
+
+	end
+	
+	local B1 = plr.PlayerGui.ScreenGui.Balloon1
+	local B2 = plr.PlayerGui.ScreenGui.Balloon2
+	local B3 = plr.PlayerGui.ScreenGui.Balloon3
+	
+	if B1.Visible ~= true then
+		B1.Visible = true
+	elseif B1.Visible == true and B2.Visible ~= true then
+		B2.Visible = true
+	elseif B1.Visible == true and B2.Visible == true then
+		B3.Visible = true
+	end
+end
+
+function module.decHealth(plr, dec)
+	local hum = plr.Character:WaitForChild("Humanoid")
+	local hp = hum.Health
+	hp -= dec
+	local B1 = plr.PlayerGui.ScreenGui.Balloon1
+	local B2 = plr.PlayerGui.ScreenGui.Balloon2
+	local B3 = plr.PlayerGui.ScreenGui.Balloon3
+	
+	if B1.Visible == true then
+		B1.Visible = false
+	elseif B1.Visible ~= true and B2.Visible == true then
+		B2.Visible = false
+	elseif B1.Visible ~= true and B2.Visible ~= true then
+		B3.Visible = false
+	end
+end
+return module
