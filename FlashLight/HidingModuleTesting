@@ -76,7 +76,10 @@ function hideFuncs.CountStart(plr, spot, origPosition, humWalk)
         -- DEV TEST: Does for loop break when hideEnd() is called??
 	for i = 30, 1, -1 do
 		local GUI2, button = plr.PlayerGui.hideGUI.HidingLabel, plr.PlayerGui.hideGUI.HidingLabel.TextButton
-		button.Activated:Connect(hideFuncs.HideEnd(plr, spot, origPosition, humWalk))			
+		button.Activated:Connect(function()
+            hideFuncs.HideEnd(plr, spot, origPosition, humWalk))
+            return
+        end)
 		GUI2.Visible = true
 		button.Visible = true
 		GUI2.Text = "Hiding for: \n" .. i
