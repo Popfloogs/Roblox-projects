@@ -1,0 +1,5 @@
+local prox = script.parent
+local hide = require(game.replicatedstorage.scripts.hideFuncs)
+local spot = prox.parent
+
+prox.Triggered:Connect(hide.hide(plr, spot))
