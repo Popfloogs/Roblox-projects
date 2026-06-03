@@ -63,7 +63,7 @@ Development notes:
 	                -loop runs again with new values
 
 
-These notes are since obsolete since the refactor has run continuously until 6/2/26.
+These notes are since obsolete because the refactor has run continuously until 6/2/26.
 
 Bug fixes:
 Terminal is no longer locked out and now functions again with all new systems incorporated
