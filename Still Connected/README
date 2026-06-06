@@ -1,6 +1,80 @@
 This is not the latest version of the game.
 
-V 0.0.1
+V 0.1.5
 
-This version is designed for prototyping and environment set up.
+This version contains refactor systems for room detection, cam updates, timing and GUI additions, added environmental module prototype, and a functioning terminal.
+Refactor started on 04/20/26
 
+Development notes:
+--[[04/20/2026 Scheduled rewrite for camera system
+
+	*Current version on GITHUB for reset
+	*Introduce new modules and functions:
+	    *Modules:
+            *CamStates
+            *CamService
+            *RoomService
+        *Functions:
+            *CamStates:getState()
+            *CamStates:setState()
+            
+            *CamService:getCamera()
+            *CamService:setCamera()
+            
+            *RoomService:trapFunc()
+                -Maybe incorporate TrapFunc bool for single fire instead of mutating the values of trapFunc
+            *RoomService:getRoom()
+            *RoomService:setRoom()
+            *RoomService:detectPlayer()
+            *RoomService:requestStateChange()
+            
+            *One listener on client to handle all camera changes
+            
+	*Split functionality of GetRooms()
+	    *Rooms will only act as environment config. Setup and nothing more.
+	    *GetRooms will be reincorporated into room service as only a getter (Accessor)
+	    *All other functionality will be handled by new functions
+	    
+	*Control priority structure:
+	    *RoomService is the overall controller
+	    *RoomService will act as detection for where the player is and assign the room accordingly
+	    *CamStates will handle the state of the camera based on requested state
+	        *Priorities of States:
+	            *"Auto" is the default state of the camera (based on part detect)
+	            *"Manual" is a bypass (Auto) state that is used for reviewing in terminal
+	            *"FPV" is a bypass (Auto) state that is used for specific points in the game
+	    *CamService handles the camera switch based on current room
+	    
+	    *Structure:
+	        *RoomService assigns room (based on part detection)
+	        *CamStates maintains Auto state unless requested ("FPV", "Manual") (request by triggers in Rooms)
+	        *Rooms and CamStates directs CamService to switch camera based on room and state
+	        
+	        -Consider adding a Main script to house the overall looping (CamController???):
+	            -Handles the call of module functions based on activity?
+	            -How should this be structured???
+	            
+	                -while loop calls RoomService:getRoom(), RoomService:detectPlayer() and CamStates:getState()
+	                    -getRoom() and getState() simply return the current values, detectPlayer() decides whether those values need updated or not
+	                    -detectPlayer() either returns silently or calls setRoom() and/or requestStateChange() based on player location
+	                        -setRoom() takes detection info and sets the currRoom accordingly
+	                        -requestStateChange calls setState() to change the state if necessary
+	                        -if detectPlayer() calls for a change in Room, setRoom() will handle the call of trapFunc()
+	                -loop runs again with new values
+
+
+These notes are since obsolete because the refactor has run continuously until 6/2/26.
+
+Bug fixes:
+Terminal is no longer locked out and now functions again with all new systems incorporated
+Switch to FPV now fires properly
+Removed magnitude checks in favor of Parts bounds in box
+
+Additional features:
+first review mode is ready to use
+Environmental controls being split from other systems
+All camStates now utilized
+Environment altered and scenery added (nearly complete)
+
+Needs:
+Further refactor for scalability and separation of new systems (environment/Terminal/Timeclock)
