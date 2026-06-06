@@ -1,0 +1,114 @@
+local Term = game.ReplicatedStorage.Events.Actions.Term.Switch2Term
+local S2Term = game.ReplicatedStorage.Events.Actions.Term.S2Term
+local plr = game.Players.LocalPlayer
+
+local logs = {}
+
+Term.OnClientEvent:Connect(function()
+	if S2Term.Value == false then
+		local maingui = plr.PlayerGui:WaitForChild("TerminalGui").main
+		local pTime = plr:GetAttribute("punchTime") - plr:GetAttribute("punchStart")
+
+		maingui.Enabled = true
+
+		local mainFrame = maingui:WaitForChild("Frame")
+		local outputFrame = mainFrame:WaitForChild("OutputFrame")
+		local outputLabel = outputFrame:WaitForChild("OutputLabel")
+		local inputFrame = mainFrame:WaitForChild("InputFrame")
+		local inputBox = inputFrame:WaitForChild("InputBox")
+
+		local terminalHistory = {}
+		local terminalState = "idle"
+
+		local function getTimeString()
+			return os.date("%H:%M:%S")
+		end
+
+		local function addLine(speaker, message)
+			if #terminalHistory == 4 then
+				table.remove(terminalHistory, 1)
+			end
+			local line = string.format("[%s] %s > %s", getTimeString(), speaker, message)
+			table.insert(terminalHistory, line)
+			outputLabel.Text = table.concat(terminalHistory, "\n")
+		end
+
+		local function systemMessage(message)
+			addLine("System", message)
+		end
+
+		local function userMessage(message)
+			addLine("User", message)
+		end
+
+		inputBox.FocusLost:Connect(function(enterPressed)
+			if not enterPressed then
+				return
+			end
+
+			local text = inputBox.Text
+			if text == "" then
+				return
+			end
+
+			userMessage(text)
+			inputBox.Text = ""
+
+			-- Example command handling
+			local lowered = string.lower(text)
+
+			if terminalState == "idle" then
+				if lowered == "help" then
+					systemMessage("Available commands: help, review, confirm, exit")
+				elseif lowered == "review" then
+					systemMessage("End of shift review: Shift logs opened.")
+					systemMessage("Begin feedback...")
+					systemMessage("You punched in on time? Y/N: ")
+					terminalState = "review_1"
+
+				elseif lowered == "confirm" then
+					systemMessage("Shift logs confirmed.")
+				elseif lowered == "exit" then
+					systemMessage("Session terminated.")
+				else
+					systemMessage("Unknown input. Enter 'Help' for commands")
+				end
+			elseif terminalState == "review_1" then
+				if (lowered == "y") and (pTime < 30)then					
+					systemMessage("Well done!")
+					terminalState = "review_2"
+					
+				elseif (lowered == "y") and (pTime > 30)then
+					systemMessage("You were late today. Pay deduction initiated...")
+					terminalState = "review_2"
+				
+				elseif (lowered == "n")then
+					systemMessage("Employee failed to punch. Payroll will not be notified of your presence today.")
+					
+				else
+					systemMessage("Invalid input. Enter 'Y' or 'N'.")
+				end
+			
+			elseif terminalState == "review_2" then
+				systemMessage("You worked the night shift? Y/N: ")
+				
+				if lowered == "y" then
+					terminalState = "review_3"
+				elseif lowered == "n" then
+					terminalState = "review_3"
+				else
+					systemMessage("Invalid input. Enter 'Y' or 'N'.")
+				end
+				
+			elseif terminalState == "review_3" then
+				systemMessage("Please select a log to review: \n    1.) " .. plr.Name .. " start of shift\n    2.) " .. plr.Name .. " mid-day\n    3.) " .. plr.Name .. " end of shit")
+			end
+		end)
+
+		systemMessage("Terminal online.")
+		systemMessage("Awaiting user input.")
+		systemMessage("Available Commands: help, review, confirm, exit")
+		S2Term.Value = true
+	end
+
+end)
