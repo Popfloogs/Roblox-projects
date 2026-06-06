@@ -1,0 +1,24 @@
+local CamStates = {}
+
+CamStates.currState = 'Auto'
+CamStates.prevState = 'Auto'
+
+local function setState(currState)
+	CamStates.prevState = CamStates.currState
+	if currState == nil then 
+		CamStates.currState = CamStates.prevState 
+	else CamStates.currState = currState 	
+	end
+end
+
+function CamStates.unpackState(currRoom)
+	if currRoom.camState ~= CamStates.currState then
+		setState(currRoom.camState)	
+	end
+end
+
+function CamStates.getState()
+	return CamStates.currState
+end
+
+return CamStates
