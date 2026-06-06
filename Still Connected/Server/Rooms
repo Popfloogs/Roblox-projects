@@ -1,0 +1,175 @@
+local roomData = {}
+
+
+roomData.Rooms = {
+	["Entrance"] = {
+		Name = "Entrance Cam",
+
+		CameraSwitchTrigger = workspace.Rooms.Entrance:WaitForChild("CameraSwitchTrigger"),
+
+		camAnchors = {
+			[1] = {
+				anchor = workspace.Rooms.Entrance:WaitForChild("CameraAnchor1"),
+				cameraSubject = workspace.Rooms.Entrance.CameraAnchor1.CameraSubject,
+			}
+
+		},
+
+		box = workspace:GetPartBoundsInBox(workspace.Rooms.Entrance:WaitForChild("CameraSwitchTrigger")),
+
+		trapFunc = nil
+
+	},
+	["HallWay1"] = {
+		Name = "Hallway_1 Cam",
+
+		CameraSwitchTrigger = workspace.Rooms.Hallway:WaitForChild("CameraSwitchTrigger"),
+
+		camAnchors = {
+			[1] = {
+				anchor = workspace.Rooms.Hallway:WaitForChild("CameraAnchor1"),
+				cameraSubject = workspace.Rooms.Hallway.CameraAnchor1.CameraSubject,
+			}
+		},
+
+		queueRadius = workspace.Rooms.Hallway.CameraSwitchTrigger.Size.Magnitude / 2,
+
+		trapFunc = nil
+	},
+	["Lounge"] = {
+		Name = "Breakroom_1 Cam",
+
+		CameraSwitchTrigger = workspace.Rooms.Lounge:WaitForChild("CameraSwitchTrigger"),
+
+		camAnchors = {
+			[1] = {
+				anchor = workspace.Rooms.Lounge:WaitForChild("CameraAnchor1"),
+				cameraSubject = workspace.Rooms.Lounge.CameraAnchor1.CameraSubject,
+			}
+		},
+
+		queueRadius = workspace.Rooms.Lounge.CameraSwitchTrigger.Size.Magnitude / 2,
+
+		trapFunc = function(plr)
+			local img = "rbxassetid://88661947820723"
+			local trapScreen = game.ReplicatedStorage.Events.Traps.Door.DoorScreen
+			trapScreen:FireClient(plr, img)
+
+			local door = workspace.Rooms.Lounge.Assets:WaitForChild("Door")
+			local closed = door.Closed:GetChildren()
+			local open = door.Open:GetChildren()
+			local light = door.Keypad.Light
+
+			for _, i in pairs(closed) do
+				i.Transparency = 1
+			end
+
+			for _, i in pairs(open) do
+				i.Transparency = 0
+			end
+			light.Color = Color3.fromRGB(0, 255, 0)
+			light.SpotLight.Color = Color3.fromRGB(0, 255, 0)
+
+			task.delay(0.25, function(plr)
+				light.Color = Color3.fromRGB(255, 0, 0)
+				light.SpotLight.Color = Color3.fromRGB(255, 0, 0)
+				local sound = game.ReplicatedStorage.Events.Traps.Door["Door Shut/Close [High Quality]"]:Clone()
+				sound.Parent = door
+
+				for _, i in pairs(closed) do
+					i.Transparency = 0
+				end
+				for _, i in pairs(open) do
+					i.Transparency = 1
+				end
+
+				sound:Play()
+				sound.Ended:Wait()
+				sound:Destroy()
+
+			end)
+		end,
+
+		trapCool = false
+	},
+
+	["Office1"]= {
+		Name = "OfficeCam_1",
+		CameraSwitchTrigger = workspace.Rooms.OfficePark.Office1:WaitForChild("CameraSwitchTrigger"),
+
+		camAnchors = {
+			[1] = {
+				anchor = workspace.Rooms.OfficePark.Office1:WaitForChild("CameraAnchor1"),
+				cameraSubject = workspace.Rooms.OfficePark.Office1.CameraAnchor1.CameraSubject,
+			}
+		},
+
+		queueRadius = workspace.Rooms.OfficePark.Office1.CameraSwitchTrigger.Size.Magnitude / 2,
+
+	},
+	["Office2"]= {
+		Name = "OfficeCam_2",
+		CameraSwitchTrigger = workspace.Rooms.OfficePark.Office2:WaitForChild("CameraSwitchTrigger"),
+
+		camAnchors = {
+			[1] = {
+				anchor = workspace.Rooms.OfficePark.Office2:WaitForChild("CameraAnchor1"),
+				cameraSubject = workspace.Rooms.OfficePark.Office2.CameraAnchor1.CameraSubject,
+			}
+		},
+
+		queueRadius = workspace.Rooms.OfficePark.Office2.CameraSwitchTrigger.Size.Magnitude / 2,
+
+	},
+
+	["Switch2Fp"]= {
+		Name = "Switch2Fp",
+		CameraSwitchTrigger = workspace.Rooms.OfficePark.Assets.Office.SwitchtoFP,
+
+		camAnchors = {
+			[1] = {
+				anchor = nil,
+				cameraSubject = nil,
+			},
+		},
+		queueRadius = workspace.Rooms.OfficePark.Assets.Office.SwitchtoFP.Size,
+		
+		trapFunc = function(plr)
+			local door1 = workspace.Rooms.OfficePark.Assets.Office.OfficeDoor1
+			local door2 = workspace.Rooms.OfficePark.Assets.Office.OfficeDoor2				
+			local sound = game.ReplicatedStorage.Events.Traps.Door["Door Shut/Close [High Quality]"]:Clone()
+			sound.Parent = door1
+
+			door2.Transparency = 1
+			door2.CanCollide = false
+			door1.Transparency = 0
+			door1.CanCollide = true
+
+		end
+	},
+	
+	["Switch2Term"]= {
+		Name = "Switch2Term",
+		CameraSwitchTrigger = workspace.Rooms.OfficePark.Assets.Office.SwitchtoTerm,
+
+		camAnchors = {
+			[1] = {
+				anchor = nil,
+				cameraSubject = nil,
+			},
+		},
+		queueRadius = workspace.Rooms.OfficePark.Assets.Office.SwitchtoTerm.Size,
+
+		trapFunc = function(plr)
+			local char = plr.Character
+			local Hum = char:WaitForChild("Humanoid")
+			
+			Hum.WalkSpeed = 0
+			Hum.UseJumpPower = true
+			Hum.JumpPower = 0
+
+		end
+	}
+}
+
+return roomData
