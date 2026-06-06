@@ -1,0 +1,44 @@
+local RoomService = {}
+
+local Rooms = require(game.ServerScriptService.Rooms)
+local roomTable = Rooms.Rooms
+
+RoomService.currRoom = roomTable['Entrance']
+RoomService.prevRoom = roomTable['Entrance']
+
+
+
+local function setRoom(currRoom)
+	RoomService.prevRoom = RoomService.currRoom
+	if currRoom == nil then 
+		RoomService.currRoom = RoomService.prevRoom 
+	else RoomService.currRoom = currRoom 
+		
+	end
+end
+
+
+
+function RoomService.detectPlayer(plr)
+	local char = plr.Character
+	local HRP = char:WaitForChild("HumanoidRootPart")
+
+
+	for _, i in pairs(roomTable) do
+		local box = workspace:GetPartsInPart(i.CameraSwitchTrigger)
+		for _, j in pairs(box) do
+			if j == HRP and i ~= RoomService.currRoom then
+				setRoom(i)
+			end
+		end
+	end
+end
+
+
+function RoomService.getRoom()
+	return RoomService.currRoom
+end
+
+
+
+return RoomService
