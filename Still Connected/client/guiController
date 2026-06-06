@@ -1,0 +1,60 @@
+local UIS = game:GetService("UserInputService")
+local plr = game.Players.LocalPlayer
+
+local doorScreen = game.ReplicatedStorage.Events.Traps.Door.DoorScreen
+local s2Term = game.ReplicatedStorage.Events.Actions.Term.S2Term
+
+local screenEffectsGui = plr.PlayerGui:WaitForChild("ScreenEffects")
+local actionGUI = plr.PlayerGui:WaitForChild("Action")
+local camLabelName = actionGUI["Terminal/Cams"].CamName
+local camLabelClock = actionGUI["Terminal/Cams"].CamClock
+
+
+
+doorScreen.OnClientEvent:Connect(function(img)
+	local screenEffect = screenEffectsGui.ScreenEffects.ScreenEffect
+	screenEffect.Image = img
+	
+	screenEffectsGui.Enabled = true
+	screenEffect.Parent.BackgroundTransparency = 0.2
+	
+	local i = 0
+	while i ~= 5 do
+		screenEffect.ImageTransparency = screenEffect.ImageTransparency + 0.4
+		wait(0.05)
+		screenEffect.Parent.BackgroundTransparency = 0.35
+		screenEffect.ImageTransparency = screenEffect.ImageTransparency - 0.3
+		i = i + 1
+	end
+	
+	i = 0
+	screenEffect.Parent.BackgroundTransparency = 1
+	wait(0.05)
+	screenEffect.Parent.BackgroundTransparency = 0.5
+	
+	while i ~= 5 do
+		screenEffect.ImageTransparency = screenEffect.ImageTransparency + 0.3
+		wait(0.05)
+		screenEffect.Parent.BackgroundTransparency = 0.35
+		screenEffect.ImageTransparency = screenEffect.ImageTransparency - 0.6
+		i = i + 1
+	end
+
+	screenEffect.Parent.BackgroundTransparency = 0.2
+	screenEffectsGui.Enabled = false
+	
+end)
+
+while true do
+	wait(1)
+	
+	if s2Term.Value == true then
+		break
+	end
+	
+	currenttime = DateTime.now()
+	
+	
+	if plr:GetAttribute("camName") ~= nil then camLabelName.Text = plr:GetAttribute("camName") end
+	camLabelClock.Text = currenttime:FormatLocalTime("LTS", "en-us")
+end
