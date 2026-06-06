@@ -1,0 +1,55 @@
+local CamService = {}
+
+local camUpdate = game.ReplicatedStorage.Events.Cams.CamUpdate
+
+function CamService.sendCam(plr, currRoom, currState, randNum)
+	local newStateCheck = {currRoom, currState}
+	local currStateCheck
+	if newStateCheck == currStateCheck then return end
+	--I need to involve state in a better way here
+	if currState == 'Auto' then
+		local distRoom = currRoom
+		if randNum == 2 then
+			CamService.randCamDisturb(plr)
+			print("firing screen distortion")
+		end
+		if currRoom ~= nil then
+			local anchor = currRoom.camAnchors[1].anchor.Position
+			local lv = currRoom.camAnchors[1].cameraSubject.Position
+			local camName = currRoom.Name
+			plr:SetAttribute("camName", camName)
+			currStateCheck = {currRoom, currState}
+			camUpdate:FireClient(plr, anchor, lv, camName, 'Auto')
+		end
+
+	elseif currState == 'FPV' then
+		local anchor = nil
+		local lv = nil
+		local camName = nil
+		camUpdate:FireClient(plr, anchor, lv, camName, 'FPV')
+	
+	elseif currState == 'Manual' then
+		local anchor = nil
+		local lv = nil
+		local camName = nil
+		local Term = game.ReplicatedStorage.Events.Actions.Term.Switch2Term
+		local S2Term = game.ReplicatedStorage.Events.Actions.Term.S2Term
+		local closeTerm = game.ReplicatedStorage.Events.Actions.Term.closeTerm
+		if S2Term ~= true then Term:FireClient(plr) end
+		plr:SetAttribute('Term', true)
+		closeTerm.OnServerEvent:Connect(function()
+			
+			plr:SetAttribute('Term', 'fin')
+		end)
+		camUpdate:FireClient(plr, anchor, lv, camName, 'Manual')
+	end
+
+end
+
+
+
+function CamService.randCamDisturb(plr)
+	local trapScreen = game.ReplicatedStorage.Events.Traps.Door.DoorScreen
+	trapScreen:FireClient(plr, "rbxassetid://88661947820723")
+end
+return CamService
